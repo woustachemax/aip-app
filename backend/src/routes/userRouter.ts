@@ -1,8 +1,10 @@
 import { Hono } from 'hono'
 import { PrismaClient } from '@prisma/client/edge'
 import { withAccelerate } from '@prisma/extension-accelerate'
-import bcrypt, { hash } from 'bcryptjs';
+import bcrypt from 'bcryptjs';
 import { sign } from 'hono/jwt';
+import { signupSchema } from '@woustachemax/aip-app-common';
+import { loginSchema } from '@woustachemax/aip-app-common';
 
 export const userRouter  = new Hono<{
     Bindings: {
@@ -26,7 +28,14 @@ userRouter.post('/signup', async (c) => {
 
         datasourceUrl: c.env?.DATABASE_URL
     }).$extends(withAccelerate());
-    const signupBody = await c.req.json()
+    const signupBody = await c.req.json();
+    const { success } = await signupSchema.safeParse(signupBody)
+    if(!success){
+        c.status(403);
+        return c.json({msg:
+            "Please check your inputs"
+        })
+    }
 
     try{
         const existingUser = await prisma.user.findUnique({
@@ -62,7 +71,16 @@ userRouter.post("/login", async (c)=>{
 
         datasourceUrl: c.env?.DATABASE_URL
     }).$extends(withAccelerate());
-    const login = await c.req.json()
+
+    const login = await c.req.json();
+    const { success } = await loginSchema.safeParse(login)
+    if(!success){
+        c.status(403);
+        return c.json({msg:
+            "Please check your inputs"
+        })
+    }
+
 
     try{
         const userExists = await prisma.user.findUnique({

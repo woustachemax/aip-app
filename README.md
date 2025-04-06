@@ -1,4 +1,4 @@
-# Learning Path Generator MVP
+# Learning Path Generator MVP 📚👨‍🎓
 
 This project is a Minimal Viable Product (MVP) for a learning path generator that leverages an AI Large Language Model (LLM) through Palantir Foundry.
 
@@ -9,17 +9,16 @@ This project is a Minimal Viable Product (MVP) for a learning path generator tha
 - [Technologies Used](#technologies-used)
 - [Setup and Installation](#setup-and-installation)
 - [Usage](#usage)
-- [Components](#components)
 - [Zod Validation](#zod-validation)
-- [Backend Integration](#backend-integration)
-- [Foundry and AIP Logic Integration](#foundry-and-aip-logic-integration)
+- [Backend Integration](#cloudflare-workers-and-prisma-integration)
+- [Foundry and AIP Logic Creation and Integration](#foundry-and-aip-logic-creation-and-integration)
 - [Future Improvements](#future-improvements)
 - [Contributing](#contributing)
 - [License](#license)
 
 ## Project Overview
 
-This MVP demonstrates a streamlined workflow for generating learning paths based on user-provided goals. It integrates a live LLM API (OpenAI GPT-3.5-turbo) via Palantir Foundry's AIP Logic, a Cloudflare Workers backend with Prisma, and a Supabase-like Vite React frontend. The primary goal is to showcase core functionality quickly and efficiently.
+This MVP demonstrates a streamlined workflow for generating learning paths based on user-provided goals. It integrates a live LLM API (OpenAI GPT-4o) via Palantir Foundry's AIP Logic, a Cloudflare Workers backend with Prisma, and a Supabase-like Vite React frontend. The primary goal is to showcase core functionality quickly and efficiently.
 
 ## Features
 
@@ -38,7 +37,7 @@ This MVP demonstrates a streamlined workflow for generating learning paths based
 - **Validation:** Zod
 - **Backend:** Cloudflare Workers
 - **ORM:** Prisma
-- **LLM API:** OpenAI GPT-3.5-turbo
+- **LLM API:** OpenAI GPT-4o
 - **Foundry:** Palantir Foundry
 - **AIP Logic:** Palantir Foundry's AIP Logic
 
@@ -47,8 +46,8 @@ This MVP demonstrates a streamlined workflow for generating learning paths based
 1.  **Clone the repository:**
 
     ```bash
-    git clone [repository URL]
-    cd [repository directory]
+    git clone https://github.com/woustachemax/aip-app
+    cd aip-app
     ```
 
 2.  **Install dependencies (Frontend):**
@@ -100,10 +99,6 @@ This MVP demonstrates a streamlined workflow for generating learning paths based
 
 3.  **Enter a learning goal in the form and click "Generate Learning Path."**
 
-## Components
-
--   `LearningPathForm.js`: Handles user input and form submission, including Zod validation.
--   `LearningPathDisplay.js`: Displays the generated learning path.
 
 ## Zod Validation
 
@@ -113,11 +108,31 @@ The learning goal input is validated using Zod to ensure it meets specific crite
 
 Cloudflare Workers acts as the serverless backend, handling API requests. Prisma is used to interact with the database, managing data persistence.
 
-## Foundry and AIP Logic Integration
+## Foundry and AIP Logic Creation and Integration
+1.  **Accessing AIP Logic:** Within the Palantir Foundry environment, I navigated to the "AIP Logic" application. This is Foundry's dedicated workspace for building AI-powered functions using a visual, low-code interface.
 
-AIP Logic is used to integrate with the OpenAI GPT-3.5-turbo API. The AIP Logic function takes the user's learning goal as input and returns a structured learning path in JSON format.
+2.  **Creating a New Function:** I initiated the creation of a new AIP Logic function and named it `generateLearningPathWithLLM`. I also defined an API-friendly name, `generateLearningPath`, which is used for programmatic access.
 
-## Future Improvements
+3.  **Defining the Input:** The function is designed to accept a single input:
+    * **Name:** `goal`
+    * **Type:** `String`
+    * This input is marked as **Required**, ensuring that a learning objective is provided for the path generation.
+
+4.  **Implementing the Core Logic with "Use LLM":** The heart of the function lies in the "Use LLM" block, which facilitates interaction with a Large Language Model. Within this block:
+    * **Prompt Engineering:** I crafted a detailed prompt instructing the LLM to generate a structured learning path. The prompt specifies the desired output format as a JSON object with `learningPathId`, `goal`, and an array of `steps`.
+    * **Input Referencing:** To dynamically insert the user-provided learning `goal` into the prompt, I utilized the `/goal` syntax directly within the prompt text, as per AIP Logic best practices for referencing function inputs within the "Use LLM" block. The "Provide input data" section of the block was left empty, as the input is directly referenced in the prompt.
+    * **Model Selection:** The function is configured to use the `GPT-4o` model (or the specific model you selected) for generating the learning paths.
+    * **Output Type:** The output type of the "Use LLM" block (and therefore the function) is set to `String`, as the LLM returns the learning path as a JSON-formatted string.
+
+5.  **Testing within AIP Logic:** Throughout the development process, I utilized the built-in Debugger within the AIP Logic editor. This allowed me to provide sample learning goals as input and verify that the function was generating the learning paths in the expected JSON format. These tests confirmed the correct configuration of the input, the LLM prompt, and the overall logic.
+
+6.  **Publishing the Function:** Once the function was thoroughly tested and deemed ready for integration, I published it within Foundry. This process assigned the function a unique Resource Identifier (RID) and made it available as an API endpoint that can be called by external applications. The publishing process also manages versioning of the function.
+
+In essence, the `generateLearningPathWithLLM` function was created using AIP Logic's visual interface by defining an input, configuring a "Use LLM" block with a specific prompt that references the input, and then publishing the function to make it accessible via an API.
+
+
+
+## Future Improvements 
 
 -   Implement a more sophisticated UI/UX.
 -   Add user authentication and authorization.
@@ -127,7 +142,9 @@ AIP Logic is used to integrate with the OpenAI GPT-3.5-turbo API. The AIP Logic 
 -   Optimize database queries with Prisma.
 -   Improve Cloudflare Workers performance.
 
-## Contributing
+## Contributing 🚀
 
-Contributions are welcome! Please fork the repository and submit a pull request with your changes.
+Contributions are welcome! Please fork the repository and submit a pull request with your changes, 🤎 [woustachemax](https://woustachemax.github.io/portfolio).
+
+
 

@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 import { verify } from 'hono/jwt';
+//import { foundryResponseSchema } from '@woustachemax/aip-app-common';
 
 export const functionalRouter = new Hono<{
   Bindings: {

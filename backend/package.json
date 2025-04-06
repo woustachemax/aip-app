@@ -7,6 +7,7 @@
   "dependencies": {
     "@prisma/client": "^6.5.0",
     "@prisma/extension-accelerate": "^1.3.0",
+    "@woustachemax/aip-app-common": "^1.0.0",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^3.0.2",
     "hono": "^4.7.5",
