@@ -1,37 +1,64 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { SignupSchema } from "@woustachemax/aip-app-common";
+import { Link, useNavigate } from "react-router-dom";
+import { SignupSchema, LoginSchema } from "@woustachemax/aip-app-common";
 
-export const Auth = ({type}) => {
+export const Auth = ({ type }) => {
   const [inputs, setInputs] = useState({
     email: "",
     password: "",
-    name: ""
+    name: "",
   });
-
   const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrors({});
 
-    const result = SignupSchema.safeParse(inputs);
+    let validationResult;
+    const endpoint = type === "signup" ? "/api/v1/user/signup" : "/api/v1/user/login";
+    const schema = type === "signup" ? SignupSchema : LoginSchema;
 
-    if (!result.success) {
+    validationResult = schema.safeParse(inputs);
+
+    if (!validationResult.success) {
       const fieldErrors = {};
-      result.error.errors.forEach((err) => {
+      validationResult.error.errors.forEach((err) => {
         fieldErrors[err.path[0]] = err.message;
       });
       setErrors(fieldErrors);
-    } else {
-      setErrors({});
-      console.log("Valid data:", result.data);
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:8787${endpoint}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(validationResult.data),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log("Success:", data);
+        localStorage.setItem("authToken", data.jwt || data.token);
+        navigate("/functionality");
+      } else {
+        console.error("Error:", data);
+        setErrors(data);
+      }
+    } catch (error) {
+      console.error("Fetch error:", error);
+      setErrors({ general: "An unexpected error occurred." });
     }
   };
 
   return (
     <div className="h-screen flex justify-center flex-col">
       <div className="flex justify-center">
-      <form
+        <form
           className="text-slate-800 justify-center w-full max-w-md"
           onSubmit={handleSubmit}
         >
@@ -75,6 +102,8 @@ export const Auth = ({type}) => {
             onChange={(e) => setInputs({ ...inputs, password: e.target.value })}
           />
 
+          {errors.general && <p className="text-red-500 text-sm mt-1">{errors.general}</p>}
+
           <button
             type="submit"
             className="mt-4 w-full bg-slate-800 text-white p-2 rounded-lg hover:bg-slate-700"
@@ -82,7 +111,6 @@ export const Auth = ({type}) => {
             {type === "login" ? "Log In" : "Sign Up"}
           </button>
         </form>
-
       </div>
     </div>
   );
@@ -106,7 +134,7 @@ const Label = ({ label, placeholder, type = "text", value, onChange, error }) =>
         onChange={onChange}
         className={`bg-gray-50 border ${
           error ? "border-red-500" : "border-gray-300"
-        } text-slate-800 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 
+        } text-slate-800 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500
         block w-full p-2.5`}
         required
       />

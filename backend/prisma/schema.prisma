@@ -19,9 +19,5 @@ model User{
   name String?
   email String @unique
   password String
-  // documents Document[]
 }
 
-// model Document{
-  
-// }

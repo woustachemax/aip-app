@@ -5,6 +5,7 @@ import bcrypt from 'bcryptjs';
 import { sign } from 'hono/jwt';
 import { signupSchema } from '@woustachemax/aip-app-common';
 import { loginSchema } from '@woustachemax/aip-app-common';
+import { cors } from 'hono/cors'
 
 export const userRouter  = new Hono<{
     Bindings: {
@@ -12,6 +13,9 @@ export const userRouter  = new Hono<{
         JWT_SECRET: string,
     }
 }>();
+
+userRouter.use('*', cors());
+
 
 userRouter.post('/signup', async (c) => {
 
@@ -101,7 +105,7 @@ userRouter.post("/login", async (c)=>{
 
         const token = await sign({id: userExists.id}, c.env.JWT_SECRET);
         c.status(200)
-        return c.json({ token }) , c.json("verified")
+        return c.json({ token: token, message: "verified" });
 
 
     }
